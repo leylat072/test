@@ -41,7 +41,9 @@ with open(file_output, 'w') as csvfile:
             timestamp = time.time() - timestampStart
             #print(state)
             action = agent.act(state) 
-            #print(action)
+            #if action[0] == 1 :
+                #print('action[0]')
+                #print(action[0])
             next_state , reward, dead= engine.step(action) 
             #print(next_state)
             array = np.array(action).reshape(-1,)
@@ -52,11 +54,13 @@ with open(file_output, 'w') as csvfile:
             if total_reward > best_total_reward:
                 best_total_reward = total_reward
             agent.step(action, reward, next_state, dead)
-            #print()
+            #print(reward)
             state = next_state
-            print(engine)
+            #print(engine)
             ##########################################
-         
+            #print(action)
+            #engine._new_piece()
+            #print(engine.shape_idx)
             ###########################################
             #engine._update_score(0)
             #print(engine.score)

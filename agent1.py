@@ -82,11 +82,13 @@ class Actor:
         # Add final output layer with sigmoid activation
         raw_actions = layers.Dense(units=self.action_size, activation='sigmoid',
             name='raw_actions')(net)
+        print('raw_actions')
         print(raw_actions)
         # Scale [0, 1] output for each action dimension to proper range
         actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
             name='actions')(raw_actions)
         print(actions)
+        print('actions')
         #with open('agent', 'w') as csvfile:
             #writer = csv.writer(csvfile)
             #writer.writerow(raw_actions)  
@@ -260,12 +262,18 @@ class DDPG():
         #print('next_states')
         actions_next = self.actor_target.model.predict_on_batch(next_states)
         Q_targets_next = self.critic_target.model.predict_on_batch([next_states, actions_next])
-        file_output = 'data1.txt' 
+        file_output = 'data3.txt' 
         with open(file_output, 'w') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(np.array(Q_targets_next) ) 
        
-        Q_targets = rewards + self.gamma * Q_targets_next * (1 - dones)
+        Q_targets1 = rewards + self.gamma * Q_targets_next * (1 - dones)
+        Q_targets = rewards + self.gamma * Q_targets_next 
+        file_output = 'data3.txt' 
+        with open(file_output, 'w') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(np.array(Q_targets1) ) 
+            writer.writerow(np.array(Q_targets) ) 
         #print(Q_targets.shape)
         #print(actions.shape)
         #print(Q_targets.shape)

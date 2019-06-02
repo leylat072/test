@@ -29,6 +29,7 @@ class Shapes(object):
 
     def __getitem__(self, i):
         return self.ORIENTATIONS[i]
+        #return self.ORIENTATIONS[6]
 
     def __len__(self):
         return 7
@@ -174,8 +175,12 @@ class TetrisEngine(object):
         # return 6
 
     def _new_piece(self):
+        #self.anchor = (self.width / 2, 0)
+        #self.shape_idx = self._choose_shape()
+        #self.shape = self.shapes[self.shape_idx]
+        #print('sss')
         self.anchor = (self.width / 2, 0)
-        self.shape_idx = self._choose_shape()
+        self.shape_idx = 6 #self._choose_shape()
         self.shape = self.shapes[self.shape_idx]
 
     def has_dropped(self, shape, anchor, board):
@@ -212,6 +217,7 @@ class TetrisEngine(object):
             else:
                 self.tetris_flag = False
         else:
+            
             _height = 0
             _has = 0
             score  =0 
@@ -230,13 +236,14 @@ class TetrisEngine(object):
             #print(engine.board)
             # print(engine)
             if(_height > self.height/2):
-                score += -100
+                self.score += -100
             if(_height< self.height/2 and _height > self.height/4):
-                score += -50
+                self.score += -50
             if(_height< self.height/4 and _height > self.height/8):
-                score += -10
+                self.score += -10
             else:
-                score += -1
+                self.score += -5
+            #print(self.score)
             #print('score')
             #print(score)
 
@@ -274,8 +281,19 @@ class TetrisEngine(object):
 
         self.clear_piece()
         return board_copy
-
+    def step1(self, action):
+         ############################################################################
+        rewardAll = 0
+        states = []
+        for _ in range(3):
+            next_state, reward, dead  = self.step1(action)
+            rewardAll += reward
+            states.append(self.board)
+        next_state = np.concatenate(states)
+        return next_state, rewardAll, dead
+        ############################################################################s
     def step(self, action):
+       
         #print(action)
         #action = np.array(action).argmax()
         action = math.ceil(action[0])
@@ -308,7 +326,7 @@ class TetrisEngine(object):
         next_state = self.board
 
         # Returns the computed score.
-        reward = float(self.score - prev_score) * 0.01;
+        reward = float(self.score - prev_score) * 0.01
         if self.dead:
             reward = -1.
        
