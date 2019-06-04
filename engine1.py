@@ -296,7 +296,50 @@ class TetrisEngine(object):
        
         #print(action)
         #action = np.array(action).argmax()
-        action = math.ceil(action[0])
+        #action = round(action[0])
+        action = round(action[0]*5)
+        #print(action[0]* 5)
+        if(action < 0 ):
+            action = 0
+        if( action > 5):
+            action =5
+        #print(action)
+        prev_score = self.score
+        self.dead = False
+        act_params = (self.shape, self.anchor, self.board)
+        self.shape, self.anchor = self.actions[action](*act_params)
+        self.time += 1
+
+        # Drops once every 5 steps, unless it was a hard drop.
+        if action not in self.actions.DROPS:
+            act_params = (self.shape, self.anchor, self.board)
+            self.shape, self.anchor = self.actions.soft_drop(*act_params)
+
+        if self._has_dropped():
+            self.set_piece()
+            self._clear_lines()
+            if np.any(self.board[:, 0]):
+                self.clear()
+                self.deaths += 1
+                self.dead = True
+            else:
+                self._new_piece()
+        self._update_score()
+        next_state = self.board
+
+        # Returns the computed score.
+        reward = float(self.score - prev_score) * 0.01
+        if self.dead:
+            reward = -1.
+       
+        return next_state, reward, self.dead
+    def step1(self, action):
+       
+        #print(action)
+        #action = np.array(action).argmax()
+        #action = round(action[0])
+        #action = round(action[0]*2)
+        #print(action[0]* 5)
         if(action < 0 or action > 5):
             action = 0
         if( action > 5):
