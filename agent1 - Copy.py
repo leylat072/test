@@ -65,7 +65,7 @@ class Actor:
     def build_model(self):
         """Build an actor (policy) network that maps states -> actions."""
         # Define input layer (states)
-        #states ----> actions
+       
         #states = layers.Input(shape= self.BOARD_SHAPE, name='states')
        # states = layers.Reshape((10, 10), input_shape=self.BOARD_SHAPE);
         #statest = layers.Reshape((10, 10), input_shape=self.BOARD_SHAPE);
@@ -134,7 +134,7 @@ class Critic:
        
         #states = layers.Input(shape=self.BOARD_SHAPE, name='states')
         #statest = layers.Reshape((10, 10), input_shape=self.BOARD_SHAPE);
-        states = layers.Input(shape=(self.state_size,) , name='states')
+        states = layers.Input(shape=(self.state_size,) , name='states');
         #states =ks.layers.Reshape((10, 10), input_shape=self.stateShape)
         actions = layers.Input(shape=(self.action_size,), name='actions')
 
@@ -201,7 +201,7 @@ class DDPG():
         self.noise = OUNoise(self.action_size, self.exploration_mu, self.exploration_theta, self.exploration_sigma)
         # Replay memory
         self.buffer_size = 100000
-        self.batch_size = 100
+        self.batch_size = 64
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size)
 
         # Algorithm parameters
@@ -262,22 +262,19 @@ class DDPG():
         #print(next_states)
         #print('next_states')
         actions_next = self.actor_target.model.predict_on_batch(next_states)
-        #value = round(np.array(actions_next).argmax())
-        #for x in range(0,5):
-            #actions_next[x] =value
         Q_targets_next = self.critic_target.model.predict_on_batch([next_states, actions_next])
-        #file_output = 'data3.txt' 
-        #with open(file_output, 'w') as csvfile:
-            ##writer = csv.writer(csvfile)
-           # writer.writerow(np.array(Q_targets_next) ) 
+        file_output = 'data3.txt' 
+        with open(file_output, 'w') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(np.array(Q_targets_next) ) 
        
-        #Q_targets1 = rewards + self.gamma * Q_targets_next * (1 - dones)
+        Q_targets1 = rewards + self.gamma * Q_targets_next * (1 - dones)
         Q_targets = rewards + self.gamma * Q_targets_next 
-        #file_output = 'data3.txt' 
-        #with open(file_output, 'w') as csvfile:
-            #writer = csv.writer(csvfile)
-            #writer.writerow(np.array(Q_targets1) ) 
-            #writer.writerow(np.array(Q_targets) ) 
+        file_output = 'data3.txt' 
+        with open(file_output, 'w') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(np.array(Q_targets1) ) 
+            writer.writerow(np.array(Q_targets) ) 
         #print(Q_targets.shape)
         #print(actions.shape)
         #print(Q_targets.shape)
@@ -307,4 +304,4 @@ class DDPG():
         self.task.clear()
         #self.last_state = state
         self.last_state =self.task.getState()
-        return self.last_state
+        return self.task.board

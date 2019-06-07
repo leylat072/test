@@ -20,7 +20,7 @@ from engine1 import TetrisEngine
 runtime = 7                                     # time limit of the episode
 num_episodes = 10000
 file_output = 'data.txt' 
-engine = TetrisEngine(6,20)
+engine = TetrisEngine(10,20)
 #print(engine.state_size)
 #print(engine.width)
 #print(engine.height)
@@ -44,17 +44,13 @@ with open(file_output, 'w') as csvfile:
             #print(state)
             #print(engine)
             action = agent.act(state) 
-            #print('sta')
-            #print(state)
             #if action[0] == 1 :
                 #print('action[0]')
                 #print(action[0])
             next_state , reward, dead= engine.step(action) 
-            #print('next_state')
-            #print(next_state)
             #print('------------------------------nextstate---------------------------------------')
             #print(next_state)
-            #print(engine)
+            print(engine)
             array = np.array(action).reshape(-1,)
             #print(array.argmax())
             writer.writerow(array)
@@ -65,9 +61,9 @@ with open(file_output, 'w') as csvfile:
             agent.step(action, reward, next_state, dead)
             #print(reward)
             state = next_state
-            print(engine)
+            #print(engine)
             ##########################################
-            #print(reward)
+            print(reward)
             #print(action)
             #print('ddds')
             #print(action[0])

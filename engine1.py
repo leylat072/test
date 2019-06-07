@@ -38,13 +38,18 @@ class Shapes(object):
 class Actions(object):
     LEFT = 0
     RIGHT = 1
+    #LEFT = 5
+    #RIGHT = 4
     SHIFTS = (0, 1)
+    #SHIFTS = (4, 5)
     HARD_DROP = 2
     SOFT_DROP = 3
     DROPS = (2, 3)
     ROTATE_LEFT = 4
     ROTATE_RIGHT = 5
-    ROTATES = (4, 5)
+    #ROTATE_LEFT = 1
+    #ROTATE_RIGHT = 0
+    #ROTATES = (0, 1)
 
     def __init__(self):
         self.FUNCTIONS = {
@@ -73,6 +78,12 @@ class Actions(object):
         return False
 
     def left(self, shape, anchor, board):
+        new_anchor = (anchor[0] - 1, anchor[1])
+        if self.is_occupied(shape, new_anchor, board):
+            return (shape, anchor)
+        else:
+            return (shape, new_anchor)
+    def left1(self, shape, anchor, board):
         new_anchor = (anchor[0] - 1, anchor[1])
         if self.is_occupied(shape, new_anchor, board):
             return (shape, anchor)
@@ -127,21 +138,24 @@ class TetrisEngine(object):
 #class TetrisEngine():
     def __init__(self, width, height):
        
-       
+        
+
         
         #print(len(engine.actions))
         #print(len(engine.shapes))
         #print(len(engine.board))
         
+        
         self.width = width
         self.height = height
         self.board = np.zeros(shape=(width, height), dtype=np.bool)
+        #self.board = np.zeros(shape=(height, width), dtype=np.bool)
         #print(self.board.shape)
         self.shapes = Shapes()
         self.actions = Actions()
         
         self.state_size = width * height
-        self.action_size =  1#len(self.actions)
+        self.action_size =  len(self.actions)
         self.action_low = 0
         self.action_high = 5
 
@@ -236,13 +250,13 @@ class TetrisEngine(object):
             #print(engine.board)
             # print(engine)
             if(_height > self.height/2):
-                self.score += -100
+                self.score += -1000
             if(_height< self.height/2 and _height > self.height/4):
-                self.score += -50
+                self.score += -800
             if(_height< self.height/4 and _height > self.height/8):
-                self.score += -10
+                self.score += -400
             else:
-                self.score += -5
+                self.score += -100
             #print(self.score)
             #print('score')
             #print(score)
@@ -295,9 +309,12 @@ class TetrisEngine(object):
     def step(self, action):
        
         #print(action)
+        #print('action')
+        #print(self.getState())
+        #print(self.board)
         #action = np.array(action).argmax()
         #action = round(action[0])
-        action = round(action[0]*5)
+        action = round(np.array(action).argmax())
         #print(action[0]* 5)
         if(action < 0 ):
             action = 0
@@ -325,14 +342,24 @@ class TetrisEngine(object):
             else:
                 self._new_piece()
         self._update_score()
-        next_state = self.board
+        next_state = self.getState()
 
         # Returns the computed score.
-        reward = float(self.score - prev_score) * 0.01
+        #reward = float(self.score - prev_score) * 0.01
+        reward = self.score
         if self.dead:
             reward = -1.
        
         return next_state, reward, self.dead
+    def getState(self):
+        state =  np.zeros(shape=(self.height, self.width), dtype=np.bool)
+        c = np.zeros(shape=(self.height, self.width), dtype=np.bool)
+        for i in range(0,self.height):
+            for j in range(0,self.width):
+                state[i][j] = self.board[j][self.height-1-i]
+        return state
+            
+
     def step1(self, action):
        
         #print(action)
@@ -366,7 +393,7 @@ class TetrisEngine(object):
             else:
                 self._new_piece()
         self._update_score()
-        next_state = self.board
+        next_state = self.getState()
 
         # Returns the computed score.
         reward = float(self.score - prev_score) * 0.01
