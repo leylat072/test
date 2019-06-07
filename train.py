@@ -29,6 +29,7 @@ labels = ['episod', 'total_reward']
 results = {x : [] for x in labels}
 ## Run the simulation, and save the results.
 #sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime)
+mmm= False
 with open(file_output, 'w') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(labels)  
@@ -54,7 +55,7 @@ with open(file_output, 'w') as csvfile:
             #print(next_state)
             #print('------------------------------nextstate---------------------------------------')
             #print(next_state)
-            #print(engine)
+            print(engine)
             array = np.array(action).reshape(-1,)
             #print(array.argmax())
             writer.writerow(array)
@@ -65,8 +66,52 @@ with open(file_output, 'w') as csvfile:
             agent.step(action, reward, next_state, dead)
             #print(reward)
             state = next_state
-            print(engine)
+            #print(engine)
             ##########################################
+            if len(agent.memory) > agent.batch_size and mmm == True:
+                experiences = agent.memory.sample()
+                states = np.vstack([e.state for e in experiences if e is not None]).reshape(-1,120)
+                actions = np.array([e.action for e in experiences if e is not None]).astype(np.float32).reshape(-1, agent.action_size)
+                #actions = np.array([e.action for e in experiences if e is not None]).astype(np.float32).reshape(-1, 1)
+            
+                rewards = np.array([e.reward for e in experiences if e is not None]).astype(np.float32).reshape(-1, 1)
+                dones = np.array([e.done for e in experiences if e is not None]).astype(np.uint8).reshape(-1, 1)
+                next_states = np.vstack([e.next_state for e in experiences if e is not None]).reshape(-1, agent.state_size)
+                m =states[0]
+                #state =  np.zeros(shape=(20, 6), dtype=np.bool)
+                c = np.zeros(shape=(20, 6), dtype=np.bool)
+                for i in range(0,20):
+                    for j in range(0,6):
+                        c[i][j] = m[j + 6* i]
+                        
+                _states = []
+                for i in range(0,self.buffer_size-1): 
+                    _states.append(agent.getState2(states[i]))
+                print(_states)
+                print(state)
+                print('fffff')
+                print(c)
+                print(len(states))
+                print('+++++++++++++++++++++')
+                print((states[0]))
+                print('+++++++++++++++++++++')
+                print(len(actions))
+                print('+++++++++action[0]++++++++++++')
+                print(actions[0])
+                print('+++++++++++++++++++++')
+                print(len(rewards))
+                print('+++++++++++++++++++++')
+                print((rewards[0]))
+                print('+++++++++++++++++++++')
+                print(len(dones))
+                print('+++++++++++++++++++++')
+                print(dones[0])
+                print('+++++++++++++++++++++')
+                print(len(next_states))
+                print('+++++++++++++++++++++')
+                print(next_states[0])
+                print('+++++++++++++++++++++')
+                #mmm =False
             #print(reward)
             #print(action)
             #print('ddds')
@@ -99,6 +144,8 @@ with open(file_output, 'w') as csvfile:
             j = j+1
         sys.stdout.flush()
 print('ddd')
+
+
 
         
 

@@ -257,15 +257,22 @@ class DDPG():
         dones = np.array([e.done for e in experiences if e is not None]).astype(np.uint8).reshape(-1, 1)
         next_states = np.vstack([e.next_state for e in experiences if e is not None]).reshape(-1, self.state_size)
 
+        _states = []
+        for i in range(0,99): 
+            _states.append(self.getState2(states[i]))
+        
+        _next_states = []
+        for i in range(0,99): 
+            _next_states.append(self.getState2(next_states[i]))
         # Get predicted next-state actions and Q values from target models
         #     Q_targets_next = critic_target(next_state, actor_target(next_state))
         #print(next_states)
         #print('next_states')
-        actions_next = self.actor_target.model.predict_on_batch(next_states)
+        actions_next = self.actor_target.model.predict_on_batch(_next_states)
         #value = round(np.array(actions_next).argmax())
         #for x in range(0,5):
             #actions_next[x] =value
-        Q_targets_next = self.critic_target.model.predict_on_batch([next_states, actions_next])
+        Q_targets_next = self.critic_target.model.predict_on_batch([_next_states, actions_next])
         #file_output = 'data3.txt' 
         #with open(file_output, 'w') as csvfile:
             ##writer = csv.writer(csvfile)
@@ -281,11 +288,11 @@ class DDPG():
         #print(Q_targets.shape)
         #print(actions.shape)
         #print(Q_targets.shape)
-        self.critic_local.model.train_on_batch(x=[states, actions], y=Q_targets)
+        self.critic_local.model.train_on_batch(x=[_states, actions], y=Q_targets)
 
         # Train actor model (local)
-        action_gradients = np.reshape(self.critic_local.get_action_gradients([states, actions, 0]), (-1, self.action_size))
-        self.actor_local.train_fn([states, action_gradients, 1])  # custom training function
+        action_gradients = np.reshape(self.critic_local.get_action_gradients([_states, actions, 0]), (-1, self.action_size))
+        self.actor_local.train_fn([_states, action_gradients, 1])  # custom training function
 
         # Soft-update target models
         self.soft_update(self.critic_local.model, self.critic_target.model)
@@ -308,3 +315,12 @@ class DDPG():
         #self.last_state = state
         self.last_state =self.task.getState()
         return self.last_state
+
+    def getState2(self,state):
+        c = np.zeros(shape=(self.height, self.width), dtype=np.bool)
+        for i in range(0,self.height):
+            for j in range(0,self.width):
+                c[i][j] = state[j + self.width* i]
+        print('99999999999999999999999999')
+        print(c)
+        return c
