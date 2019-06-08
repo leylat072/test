@@ -80,14 +80,14 @@ class Actor:
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
         # Add final output layer with sigmoid activation
-        raw_actions = layers.Dense(units=self.action_size, activation='sigmoid',
+        raw_actions = layers.Dense(units=self.action_size, activation='softmax',
             name='raw_actions')(net)
         actions= raw_actions
         print('raw_actions')
         print(raw_actions)
         # Scale [0, 1] output for each action dimension to proper range
-        actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
-            name='actions')(raw_actions)
+        #actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
+        #    name='actions')(raw_actions)
         print(actions)
         print('actions')
         #with open('agent', 'w') as csvfile:
@@ -205,8 +205,8 @@ class DDPG():
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size)
 
         # Algorithm parameters
-        self.gamma = 0.99  # discount factor
-        self.tau = 0.01  # for soft update of target parameters
+        self.gamma = 0.9  # discount factor
+        self.tau = 0.05  # for soft update of target parameters
     def step(self, action, reward, next_state, done):
          # Save experience / reward
         self.memory.add(self.last_state, action, reward, next_state, done)        # Learn, if enough samples are available in memory
@@ -229,8 +229,12 @@ class DDPG():
         #print(state.shape)
         #print('act')
         action = self.actor_local.model.predict(state.reshape(1,self.state_size))[0]
+        action1 = self.actor_local.model.predict(state.reshape(1,self.state_size))
+        print('action1')
+        print(action1)
         #action = action.squeeze(0).argmax()
-        return list(action + self.noise.sample())  # add some noise for exploration
+        return list(action) 
+        #return list(action + self.noise.sample())  # add some noise for exploration
     def act1(self, state):
         """Returns actions for given state(s) as per current policy."""
         #print(state)
@@ -268,6 +272,8 @@ class DDPG():
         #     Q_targets_next = critic_target(next_state, actor_target(next_state))
         #print(next_states)
         #print('next_states')
+        _states = states
+        _next_states = next_states
         actions_next = self.actor_target.model.predict_on_batch(_next_states)
         #value = round(np.array(actions_next).argmax())
         #for x in range(0,5):
@@ -321,6 +327,6 @@ class DDPG():
         for i in range(0,self.height):
             for j in range(0,self.width):
                 c[i][j] = state[j + self.width* i]
-        print('99999999999999999999999999')
-        print(c)
+        #print('99999999999999999999999999')
+        #print(c)
         return c

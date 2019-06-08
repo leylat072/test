@@ -315,6 +315,7 @@ class TetrisEngine(object):
         #action = np.array(action).argmax()
         #action = round(action[0])
         action = round(np.array(action).argmax())
+        #print(action)
         #print(action[0]* 5)
         if(action < 0 ):
             action = 0
@@ -341,17 +342,18 @@ class TetrisEngine(object):
                 self.dead = True
             else:
                 self._new_piece()
-        self._update_score()
+        #self._update_score()
         next_state = self.getState()
 
         # Returns the computed score.
         #reward = float(self.score - prev_score) * 0.01
-        reward = self.score
+        reward = self.score *0.001
         if self.dead:
             reward = -1.
-       
+        print(reward)
+        print('reward')
         return next_state, reward, self.dead
-    def getState(self):
+    def getState1(self):
         state =  np.zeros(shape=(self.height, self.width), dtype=np.bool)
         c = np.zeros(shape=(self.height, self.width), dtype=np.bool)
         for i in range(0,self.height):
@@ -359,7 +361,10 @@ class TetrisEngine(object):
                 state[i][j] = self.board[j][self.height-1-i]
         return state
             
-
+    def getState(self):
+        state1 = self.getState1()
+        return state1.reshape(-1)
+        
     def step1(self, action):
        
         #print(action)

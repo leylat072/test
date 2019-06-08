@@ -56,6 +56,8 @@ with open(file_output, 'w') as csvfile:
             #print('------------------------------nextstate---------------------------------------')
             #print(next_state)
             print(engine)
+            #time.sleep(0.5)
+            print(action)
             array = np.array(action).reshape(-1,)
             #print(array.argmax())
             writer.writerow(array)
@@ -85,9 +87,10 @@ with open(file_output, 'w') as csvfile:
                         c[i][j] = m[j + 6* i]
                         
                 _states = []
-                for i in range(0,self.buffer_size-1): 
+                for i in range(0,99): 
                     _states.append(agent.getState2(states[i]))
-                print(_states)
+                
+                #print(_states)
                 print(state)
                 print('fffff')
                 print(c)
